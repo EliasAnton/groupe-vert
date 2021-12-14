@@ -16,7 +16,7 @@ cd catkin-ws
 
 mkdir src
 
-git clone https://github.com/EliasAnton/groupe-vert.git src/grp-color
+git clone https://github.com/EliasAnton/groupe-vert.git src/grp-vert
 
 catkin_make
 
