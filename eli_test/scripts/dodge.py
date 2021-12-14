@@ -2,9 +2,9 @@
 import rospy, math
 from sensor_msgs.msg import LaserScan
 
+obstacles= []
+
 def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s")
-    obstacles= []
     angle= data.angle_min
     for aDistance in data.ranges :
         if 0.1 < aDistance and aDistance < 5.0 :
