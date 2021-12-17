@@ -48,14 +48,14 @@ def move_command(data):
     #with this solution, some false readings don't interrupt a smooth turn
     if (right > left) and (right > quarter / 3):
         cmd.linear.x = 0
-        cmd.angular.z= 0.8
+        cmd.angular.z= 0.5
         commandPublisher.publish(cmd)
     elif (left > right) and (left > quarter / 3):
         cmd.linear.x= 0
-        cmd.angular.z= -0.8
+        cmd.angular.z= -0.5
         commandPublisher.publish(cmd)
     else:
-        cmd.linear.x= 0.5
+        cmd.linear.x= 0.4
         cmd.angular.z= 0
         commandPublisher.publish(cmd)
 
