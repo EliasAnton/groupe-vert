@@ -2,7 +2,7 @@
 Leonie Schleiter & Elias Anton
 
 ## Introduction
-This project can be used to make a robot move in a real or a simulated environment. It needs the [mb6-tbot files](https://bitbucket.org/imt-mobisyst/mb6-tbot/src/master/) to work.\
+This project can be used to make a robot move in a real or a simulated environment. It needs the [mb6-tbot files](https://bitbucket.org/imt-mobisyst/mb6-tbot/src/master/) to work.
 
 ## Strategy: Amoeba strategy
 The Robot moves straight until it detects an obstacle. It notes if the obstacle was more at the right side or more at the left side. With this observation it decides if it is going to do a right or a left turn. The turning angle also depends on this observation.
