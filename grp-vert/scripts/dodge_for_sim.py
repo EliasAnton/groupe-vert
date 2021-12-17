@@ -11,7 +11,12 @@ commandPublisher = rospy.Publisher(
 )
 
 def main():
+    #rospy.Subscriber("scan", LaserScan, callback)
     rospy.Subscriber("scan", LaserScan, move_command)
+
+    #rospy.Timer( rospy.Duration(0.1), move_command, oneshot=False )
+
+    # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 def move_command(data):
@@ -27,10 +32,12 @@ def move_command(data):
     middle = int(middle)
     quarter = len(angles) / 4
     quarter = int(quarter)
+    eights = len(angles) / 8
+    eights = int(eights)
 
     close = 0
     
-    for b in data.ranges[middle - quarter - 30: middle + quarter]:
+    for b in data.ranges[middle - quarter - 30: middle + eights + 30]:
         if b < 0.4:
             close = close + 1
 

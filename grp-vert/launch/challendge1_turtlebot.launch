@@ -1,0 +1,20 @@
+<launch>
+  
+  <!--  ***************** Laser *****************  -->
+  <node pkg="urg_node" type="urg_node" name="laser_scanner">
+  </node>
+
+  <!--  ***************** Robot *****************  -->
+  <!-- <node pkg="turtlebot_bringup" type="minimal.launch" name="robot">
+  </node> -->
+
+  <!--  ************** Navigation  ***************  -->
+  <node pkg="grp-vert" type="dodge.py" name="py_script">
+  </node>
+
+  <!--  **************** Visualisation ****************  -->
+  <!-- <node pkg="rqt_graph" type="rqt_graph" name="graph">
+  </node>
+  <node name="rviz" pkg="rviz" type="rviz">
+  </node> -->
+</launch>
