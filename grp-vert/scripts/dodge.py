@@ -36,11 +36,11 @@ def move_command(data):
     right = 0
     left = 0
     for b in data.ranges[middle - quarter - eigth: middle]:
-        if b < 1:
+        if b < 0.4:
             right = right + 1
     
     for c in data.ranges[middle: middle + quarter + eigth]:
-        if c < 1:
+        if c < 0.4:
             left = left + 1        
 
     #turn, if most of the sensors in the important angle report an obstacle close by
@@ -55,7 +55,7 @@ def move_command(data):
         cmd.angular.z= -0.8
         commandPublisher.publish(cmd)
     else:
-        cmd.linear.x= 2
+        cmd.linear.x= 0.5
         cmd.angular.z= 0
         commandPublisher.publish(cmd)
 
