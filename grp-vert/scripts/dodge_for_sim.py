@@ -32,10 +32,9 @@ def move_command(data):
     eigth = len(angles) / 8
     eigth = int(eigth)
 
-    #we count all the individual laser rays in a certain angle in front of the robot, which report an obstacle closer than 0,4
+    #we count all the individual laser rays in a certain angle left and right of the robot, which report an obstacle closer than 0,4
     right = 0
     left = 0
-    # !!! NACHSCHAUEN OB LINKS UND right SO STIMMEN
     for b in data.ranges[middle - quarter - eigth: middle]:
         if b < 1:
             right = right + 1
@@ -68,4 +67,4 @@ if __name__ == '__main__':
 #-----------------------------------------
 # The Robot moves straight until it detects an obstacle. It notes if the obstacle was more at the
 # right side or more at the left side. With this observation it decides if it is going to do a right or a left turn.
-# 
+# The turning angle also depends on this observation.
