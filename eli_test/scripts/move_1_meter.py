@@ -6,7 +6,7 @@ from geometry_msgs.msg import Twist
 rospy.init_node('move', anonymous=True)
 
 commandPublisher = rospy.Publisher(
-    '/turtle1/cmd_vel',
+    '/cmd_vel',
     Twist, queue_size=10
 )
 
