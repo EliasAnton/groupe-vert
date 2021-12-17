@@ -15,6 +15,6 @@
   <!--  **************** Visualisation ****************  -->
   <!-- <node pkg="rqt_graph" type="rqt_graph" name="graph">
   </node>
-  <node name="rviz" pkg="rviz" type="rviz">
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/launch/rviz_config.rviz">
   </node> -->
 </launch>

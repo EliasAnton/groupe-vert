@@ -1,20 +1,25 @@
 <launch>
   
-  <!--  ***************** Laser *****************  -->
-  <node pkg="urg_node" type="urg_node" name="laser_scanner">
-  </node>
+  <!--  ***************** Simulation *****************  -->
+	<!-- <env name="GAZEBO_RESOURCE_PATH" value="$(env HOME)/.gazebo" /> -->
+	<!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+	<include file="$(find tbot_gazebo)/launch/start_world.launch">
+		<arg name="world_file" value="$(find larm)/models/challenge-1.world" />
+	</include>
 
-  <!--  ***************** Robot *****************  -->
-  <!-- <node pkg="turtlebot_bringup" type="minimal.launch" name="robot">
-  </node> -->
+    <include file="$(find tbot_gazebo)/launch/spawn_tbot.launch">
+	    <arg name="x" value="-3.32" />
+	    <arg name="y" value="-2.95" />
+	    <arg name="yaw" value="2.86" />
+    </include>
 
   <!--  ************** Navigation  ***************  -->
-  <node pkg="grp-vert" type="dodge.py" name="py_script">
+  <node pkg="grp-vert" type="dodge_for_sim.py" name="py_script">
   </node>
 
   <!--  **************** Visualisation ****************  -->
-  <!-- <node pkg="rqt_graph" type="rqt_graph" name="graph">
+  <node pkg="rqt_graph" type="rqt_graph" name="graph">
   </node>
-  <node name="rviz" pkg="rviz" type="rviz">
-  </node> -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/launch/rviz_config.rviz">
+  </node> 
 </launch>
