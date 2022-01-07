@@ -6,7 +6,7 @@
   <node pkg="gmapping" type="slam_gmapping" name="mapping_node" args="scan:=base_scan">
   </node>
   
-  <node pkg="rosbag" type="play" name="player" args="--clock /home/leonie.schleiter/catkin-ws/src/grp-vert/mapping/data/basic_localization_stage.bag">
+  <node pkg="rosbag" type="play" name="player" args="--clock $(find mapping)/data/basic_localization_stage.bag">
   </node>
 
   <!--  **************** Visualisation ****************  -->
