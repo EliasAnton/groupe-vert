@@ -4,25 +4,6 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 
-#Ensuite charger une image et la convertir de BGR à RGB si nécessaire et l’afficher :
-image = cv2.imread('moin.jpg')
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-plt.figure()
-plt.axis("off")
-plt.imshow(image)
-
-n_clusters=5
-image = image.reshape((image.shape[0] * image.shape[1], 3))
-clt = KMeans(n_clusters = n_clusters )
-clt.fit(image)
-
-hist = centroid_histogram(clt)
-bar = plot_colors(hist, clt.cluster_centers_)
-plt.figure()
-plt.axis("off")
-plt.imshow(bar)
-plt.show()
-
 def centroid_histogram(clt):
     numLabels = np.arange(0, len(np.unique(clt.labels_)) + 1)
     (hist, _) = np.histogram(clt.labels_, bins=numLabels)
@@ -47,3 +28,23 @@ def plot_colors(hist, centroids):
         startX = endX
 
     return bar
+
+
+#Ensuite charger une image et la convertir de BGR à RGB si nécessaire et l’afficher :
+image = cv2.imread('./moin.jpg')
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+plt.figure()
+plt.axis("off")
+plt.imshow(image)
+
+n_clusters=5
+image = image.reshape((image.shape[0] * image.shape[1], 3))
+clt = KMeans(n_clusters = n_clusters )
+clt.fit(image)
+
+hist = centroid_histogram(clt)
+bar = plot_colors(hist, clt.cluster_centers_)
+plt.figure()
+plt.axis("off")
+plt.imshow(bar)
+plt.show()
