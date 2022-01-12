@@ -3,3 +3,10 @@
 
 
 ./opencv_traincascade -data /home/elias.anton/catkin-ws/src/bilderkennung/data2 -vec /home/elias.anton/catkin-ws/src/bilderkennung/output2.vec -bg /home/elias.anton/catkin-ws/src/bilderkennung/bgTrain.txt -numPos 1000 -numNeg 1017 -numStages 20 -precalcValBufSize 2048 -precalcIdxBufSize 2048 -acceptanceRatioBreakValue 10e-5 -minHitRate 0.999 -maxFalseAlarmRate 0.5 -w 24 -h 24
+
+Leonie:
+
+./opencv_createsamples -img /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/positive7.jpg -vec /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/output3.vec -bg /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/bg.txt -num 2200 -w 30 -h 30 -bgcolor 140 -bgthresh 3 -maxxangle 1.1 -maxyangle 1.1 maxzangle 0.5 -maxidev 40 -show
+
+
+./opencv_traincascade -data /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/data3 -vec /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/output3.vec -bg /home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/bgTrainLeo.txt -numPos 1500 -numNeg 1912 -numStages 20 -precalcValBufSize 2048 -precalcIdxBufSize 2048 -minHitRate 0.999 -maxFalseAlarmRate 0.5 -w 30 -h 30
