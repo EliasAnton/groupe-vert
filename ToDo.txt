@@ -1,0 +1,3 @@
+- Markierungsmechanismus fertig machen für flaschen (Tiefe etc.)
+- Readme
+- color filter für orangene Flaschen

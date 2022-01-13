@@ -6,9 +6,9 @@ import argparse
 import numpy as np
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-#import mark_bottle
+import mark_bottle
 
-rospy.init_node('bottleDetection', anonymous=True)
+#rospy.init_node('bottleDetection', anonymous=True)
 
 lower_red = np.array([4,150,50])
 upper_red = np.array([7,245,220])
@@ -49,12 +49,12 @@ def detectAndDisplay(raw):
         if ((redCount >= (h*w)*0.04) and (whiteCount >= (h*w)*0.04)):
             center = (x + w//2, y + h//2)
             frame = cv.ellipse(frame, center, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
-            #get3DPosition(center)
+            mark_bottle.get3DPosition(center)
             
-    cv.imshow('RedMask',maskRed)
-    cv.imshow('WhiteMask',maskWhite)
-    cv.imshow('Capture - Bottle detection', frame)
-    cv.waitKey(3)
+    # cv.imshow('RedMask',maskRed)
+    # cv.imshow('WhiteMask',maskWhite)
+    # cv.imshow('Capture - Bottle detection', frame)
+    # cv.waitKey(3)
 
 # parser = argparse.ArgumentParser(description='Code for Cascade Classifier tutorial.')
 # parser.add_argument('--bottle_cascade', help='Path to bottle cascade.', default='/home/elias.anton/catkin-ws/src/bilderkennung/data2/cascade.xml')
@@ -63,7 +63,7 @@ def detectAndDisplay(raw):
 # bottle_cascade_name = args.bottle_cascade
 # bottle_cascade = cv.CascadeClassifier()
 
-bottle_cascade_name = '/home/elias.anton/catkin-ws/src/grp-vert/bilderkennung/data3/cascade.xml'
+bottle_cascade_name = '/home/elias.anton/catkin-ws/src/grp-vert/bilderkennung/data2/cascade.xml'
 bottle_cascade = cv.CascadeClassifier()
 
 #-- 1. Load the cascade
