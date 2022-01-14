@@ -22,7 +22,7 @@ bottlePublisher = rospy.Publisher(
 camera = PinholeCameraModel()
 roboPose = Pose()
 bottleIt = 0
-# depthFrame = np.zeros((256, 256, 1), dtype = "uint16")
+depthFrame = []
 # # depthFrame.encoding = "mono16"
 bridge = CvBridge()
 
@@ -40,24 +40,30 @@ def getRoboPose(data):
 def getDepthImage(raw):
     global bridge
     global depthFrame
-    depthFrame = bridge.imgmsg_to_cv2(depthFrame, "mono16")
-    raw.encoding = "mono16"
-    depthFrame = bridge.imgmsg_to_cv2(raw, "mono16")
+    depthFrame = np.array(bridge.imgmsg_to_cv2(raw, "passthrough"))
 
 # recieves pixel coordinates of centers of regions of interest and determines the 3D coordinates
 def get3DPosition(center):
+    global depthFrame
+    global camera
+    global roboPose
+    rP = roboPose
+    dF = depthFrame
+    cam = camera
+    print(center)
+    interest = cam.rectifyPoint(center)
+    coords = cam.projectPixelTo3dRay(interest)
+    depth = dF[int(center[1])][int(center[0])]
 
-    interest = camera.rectifyPoint(center)
-    coords = camera.projectPixelTo3dRay(interest)
-
+    print(depth)
     #calculates position data of the objects with the odom and camera information
     p = Pose()
-    # p.position.x = coords[2] + roboPose.position.x
-    # p.position.y = - coords[0] + roboPose.position.y
-    # p.position.z = coords[1] + roboPose.position.z
-    p.position.x = coords[2] 
-    p.position.y = - coords[0]
-    p.position.z = coords[1]
+    # p.position.x = coords[2]* (depth/2048)
+    # p.position.y = - coords[0]* (depth/2048)
+    # p.position.z = coords[1]* (depth/2048)
+    p.position.x = coords[2]* (depth/900) + rP.position.x + rP.orientation.z
+    p.position.y = - (coords[0]* (depth/900)) + rP.position.y
+    p.position.z = coords[1]* (depth/900) + rP.position.z
     p.orientation.x = 0.0
     p.orientation.y = 0.0
     p.orientation.z = 0.0
@@ -88,11 +94,6 @@ def bottle_found(position):
     c.a = 1.0
     mrk.color = c
     bottleIt = bottleIt + 1
-
-    print("----------------------------------------------------")
-    print("bottle ")
-    print(bottleIt)
-    print(position)
     
     bottlePublisher.publish(mrk)
 

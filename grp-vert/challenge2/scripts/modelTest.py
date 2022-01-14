@@ -37,9 +37,9 @@ def detectAndDisplay(raw):
     redCount = 0
     whiteCount = 0
     for (x,y,w,h) in bottles:
-        
-        #frame = cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        frame = cv.rectangle(frame, (x, int(y + (h/4))), (x+w, (y + int(h*(3/4)) ) ), (0, 255, 0), 2)   # smaller rectangle
+        #print((x,y,w,h))
+        frame = cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        #frame = cv.rectangle(frame, (x, int(y + (h/4))), (x+w, (y + int(h*(3/4)) ) ), (0, 255, 0), 2)   # smaller rectangle
         for i in range(y + int(h/4), y + int(h*(3/4)) ):
             for j in range(x,x+w):
                 pixel = maskRed.item(i,j)
@@ -48,18 +48,22 @@ def detectAndDisplay(raw):
                     redCount = redCount + 1
                 if (pixel2 ==255):
                     whiteCount = whiteCount + 1
-                
-        # if ((redCount >= (h*w)*0.04) and (whiteCount >= (h*w)*0.04)):
-        if(True):
-            center = (x + w//2, y + h//2)
-            frame = cv.ellipse(frame, center, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
+        #filter with red and white masks
+        if ((redCount >= (h*w)*0.04) and (whiteCount >= (h*w)*0.04)):
+            falseCenter = (x + w//2, y + h//2)
+            center = list(falseCenter)
+            if center[0] >= 1280:
+                center[0] = 1279
+            if center[1] >= 720:
+                center[1] = 719
+            frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
             mark_bottle.get3DPosition(center)
             
     # opens camera windows for debugging
-    cv.imshow('RedMask',maskRed)
-    cv.imshow('WhiteMask',maskWhite)
+    #cv.imshow('RedMask',maskRed)
+    #cv.imshow('WhiteMask',maskWhite)
     cv.imshow('Capture - Bottle detection', frame)
-    cv.waitKey(3)
+    cv.waitKey(1)
 
 
 dirname = os.path.dirname(__file__)
@@ -74,4 +78,3 @@ if not bottle_cascade.load(cv.samples.findFile(bottle_cascade_name)):
 # raw cam data subscriber
 rospy.Subscriber("/camera/color/image_raw", Image, detectAndDisplay)
 rospy.spin()
-
