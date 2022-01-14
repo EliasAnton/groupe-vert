@@ -9,6 +9,7 @@ from image_geometry import PinholeCameraModel
 from cv_bridge import CvBridge
 from nav_msgs.msg import Odometry
 import numpy as np
+import cv2 as cv
 
 rospy.init_node('mark_bottles', anonymous=True)
 
@@ -17,74 +18,55 @@ bottlePublisher = rospy.Publisher(
     Marker, queue_size=10
 )
 
+# global variables
 camera = PinholeCameraModel()
 roboPose = Pose()
 bottleIt = 0
-# bridge = CvBridge()
-# rect = Image()
-# rect.encoding = "mono16"
-# rect = bridge.imgmsg_to_cv2(rect, 'mono16')
+# depthFrame = np.zeros((256, 256, 1), dtype = "uint16")
+# # depthFrame.encoding = "mono16"
+bridge = CvBridge()
 
+# reads the CameraInfo messages and updates the camera object
 def updateCamera(data):
     global camera
     camera.fromCameraInfo(data)
 
-# def getDepthImage(raw):
-#     global rect
-#     global camera
-#     global bridge
-#     raw.encoding = "mono16"
-#     changedraw = bridge.imgmsg_to_cv2(raw, "mono16")
-#     camera.rectifyImage(changedraw, rect)
-#     interest = camera.rectifyPoint((5,5))
-#     coords = camera.projectPixelTo3dRay(interest)
-#     print("rect")
-#     print(coords)
-
-
+# reads the Odom messages and updates the robots position
 def getRoboPose(data):
     global roboPose
     roboPose = data.pose.pose
 
+# reads the depth Image data and converts it to a usable format
+def getDepthImage(raw):
+    global bridge
+    global depthFrame
+    depthFrame = bridge.imgmsg_to_cv2(depthFrame, "mono16")
+    raw.encoding = "mono16"
+    depthFrame = bridge.imgmsg_to_cv2(raw, "mono16")
+
+# recieves pixel coordinates of centers of regions of interest and determines the 3D coordinates
 def get3DPosition(center):
-    #2D pixel in 3D umrechnen und publishen (Pos )
-    # coords = []
-    # x = center[0]
-    # y = center[1]
-    # for i in range(y-3, y+3 ):
-    #         for j in range(x-3, x+3):
-    #             interest = camera.rectifyPoint((i,j))
-    #             coords.append(camera.projectPixelTo3dRay(interest))
-    
-    # # median = np.median(list(dict(coords).values()))
-
-    # xMean = 0
-    # yMean = 0
-    # zMean = 0
-
-    # for el in coords:
-    #     xMean = xMean + el[2]
-    #     yMean = yMean + el[0]
-    #     zMean = zMean + el[1]
-
-    # xMean = xMean / len(coords)
-    # yMean = yMean / len(coords)
-    # zMean = zMean / len(coords)
 
     interest = camera.rectifyPoint(center)
     coords = camera.projectPixelTo3dRay(interest)
 
+    #calculates position data of the objects with the odom and camera information
     p = Pose()
-    p.position.x = coords[2] + roboPose.position.x
-    p.position.y = coords[0] + roboPose.position.y
-    p.position.z = coords[1] + roboPose.position.z + 0.1
+    # p.position.x = coords[2] + roboPose.position.x
+    # p.position.y = - coords[0] + roboPose.position.y
+    # p.position.z = coords[1] + roboPose.position.z
+    p.position.x = coords[2] 
+    p.position.y = - coords[0]
+    p.position.z = coords[1]
     p.orientation.x = 0.0
     p.orientation.y = 0.0
     p.orientation.z = 0.0
     p.orientation.w = 1.0
 
+    #publish position
     bottle_found(p)
 
+# creates marker and publishes it in /bottle topic
 def bottle_found(position):
     global bottleIt
     mrk= Marker()
@@ -106,6 +88,7 @@ def bottle_found(position):
     c.a = 1.0
     mrk.color = c
     bottleIt = bottleIt + 1
+
     print("----------------------------------------------------")
     print("bottle ")
     print(bottleIt)
@@ -116,6 +99,5 @@ def bottle_found(position):
 
 rospy.Subscriber("/camera/aligned_depth_to_color/camera_info", CameraInfo, updateCamera)
 rospy.Subscriber("/odom", Odometry, getRoboPose)
-#rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, getDepthImage)
-#rospy.spin()
+rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, getDepthImage)
 
