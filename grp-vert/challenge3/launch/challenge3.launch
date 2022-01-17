@@ -1,0 +1,18 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/>
+
+  <!--  ***************** Mapping *****************  -->
+  <node pkg="gmapping" type="slam_gmapping" name="mapping_node" args="scan:=scan">
+  </node>
+
+  <!--  ***************** Python Scripts *****************  -->
+  <node pkg="grp-vert" type="modelTest.py" name="modelTest" output="screen">
+  </node>
+
+  <!--  **************** Visualisation ****************  -->
+  <node pkg="rqt_graph" type="rqt_graph" name="graph">
+  </node>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/challenge3/launch/rviz_config_mapping.rviz">
+  </node> 
+</launch>

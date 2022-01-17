@@ -1,3 +1,6 @@
-- Markierungsmechanismus fertig machen für flaschen (Tiefe etc.)
-- Readme
-- color filter für orangene Flaschen
+- Markierungsmechanismus fertig machen
+- Navigation (ein bisschen intelligent)
+- Modell/Farbfilter verbessern
+
+- smooth robo
+- color filter für orangene Flaschen??
