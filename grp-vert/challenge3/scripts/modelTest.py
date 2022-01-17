@@ -10,8 +10,8 @@ import mark_bottle
 import os
 
 # upper and lower ranges for our color filters in HSV format
-lower_red = np.array([4,150,50])
-upper_red = np.array([7,245,220])
+lower_red = np.array([3,150,50])
+upper_red = np.array([8,245,220])
 lower_white = np.array([0,0,150])
 upper_white = np.array([179,50,220])
 
@@ -30,8 +30,15 @@ def detectAndDisplay(raw):
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     maskRed = cv.inRange(hsv, lower_red, upper_red)
     maskWhite = cv.inRange(hsv, lower_white, upper_white)
+    frame=cv.blur(frame, (7, 7))
+    maskRed=cv.erode(maskRed, None, iterations=3)
+    maskRed=cv.dilate(maskRed, None, iterations=3)
+    maskWhite=cv.erode(maskWhite, None, iterations=3)
+    maskWhite=cv.dilate(maskWhite, None, iterations=3)
+
+
     # Detect bottles
-    bottles = bottle_cascade.detectMultiScale(frame_gray)
+    bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.4, minNeighbors=8, minSize=(10,10))
     
     # checks detected regions for red and white details to eliminate false positives
     redCount = 0
@@ -58,10 +65,11 @@ def detectAndDisplay(raw):
                 center[1] = 719
             frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
             mark_bottle.get3DPosition(center)
-            
+
+
     # opens camera windows for debugging
-    #cv.imshow('RedMask',maskRed)
-    #cv.imshow('WhiteMask',maskWhite)
+    cv.imshow('RedMask',maskRed)
+    cv.imshow('WhiteMask',maskWhite)
     cv.imshow('Capture - Bottle detection', frame)
     cv.waitKey(1)
 

@@ -1,0 +1,37 @@
+<launch>
+  <!-- Bringup the robot -->
+  <include file="$(find larm)/launch/challenge-3.launch">
+  </include>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find grp-vert)/challenge3/maps/dia.yaml" />
+
+  <!-- Localization using AMCL -->
+   <node pkg="amcl" type="amcl" name="amcl" args="scan:=scan">
+   </node> 
+
+  <!-- Navigation using MoveBase -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find grp-vert)/challenge3/param/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find grp-vert)/challenge3/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/param/navfn_global_planner_params.yaml" command="load" />
+  </node> 
+
+  <!--  **************** Visualisation ****************  -->
+  <node pkg="rqt_graph" type="rqt_graph" name="graph">
+  </node>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/challenge3/launch/rviz_config_mapping.rviz">
+  </node> 
+
+  <!--  ************** Navigation  ***************  -->
+  <node pkg="turtlebot_teleop" type="turtlebot_teleop_key" name="turtlebot_teleop_keyboard"  output="screen">
+    <param name="scale_linear" value="0.5" type="double"/>
+    <param name="scale_angular" value="1.5" type="double"/>
+    <remap from="turtlebot_teleop_keyboard/cmd_vel" to="cmd_vel"/>
+  </node>
+</launch>

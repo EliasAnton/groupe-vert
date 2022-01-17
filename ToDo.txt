@@ -1,6 +1,4 @@
 - Markierungsmechanismus fertig machen
-- Navigation (ein bisschen intelligent)
 - Modell/Farbfilter verbessern
 
-- smooth robo
 - color filter für orangene Flaschen??
