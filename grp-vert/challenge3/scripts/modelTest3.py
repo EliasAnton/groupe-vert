@@ -8,6 +8,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import mark_bottle
 import os
+from tf2_geometry_msgs import PoseStamped
+from geometry_msgs.msg import Pose
 
 # upper and lower ranges for our color filters in HSV format
 lower_red = np.array([3,150,50])
@@ -21,13 +23,27 @@ def detectAndDisplay(raw):
     global upper_red
     global lower_white
     global upper_white
-    global roboOdom
     bridge = CvBridge()
+    
+    #transform map to camera
+    mapZero = PoseStamped()
+    mapZero.pose.position.x = 0
+    mapZero.pose.position.y = 0
+    mapZero.pose.position.z = 0
+    mapZero.pose.orientation.x = 0.0
+    mapZero.pose.orientation.y = 0.0
+    mapZero.pose.orientation.z = 0.0
+    mapZero.pose.orientation.w = 1.0
+    camPos = mark_bottle.transform_pose(mapZero, "map", "camera_link")
+
+    camInfoNow = mark_bottle.camInfo
+    depthFrameNow = mark_bottle.depthFrame
 
     frame = bridge.imgmsg_to_cv2(raw, desired_encoding='bgr8')
     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     frame_gray = cv.equalizeHist(frame_gray)
-    
+    # frame_gray =cv.blur(frame_gray, (7, 7))
+
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     maskRed = cv.inRange(hsv, lower_red, upper_red)
     maskWhite = cv.inRange(hsv, lower_white, upper_white)
@@ -36,8 +52,7 @@ def detectAndDisplay(raw):
     #maskRed=cv.dilate(maskRed, None, iterations=3)
     maskWhite=cv.erode(maskWhite, None, iterations=1)
     #maskWhite=cv.dilate(maskWhite, None, iterations=3)
-
-    OdomNow = mark_bottle.roboOdom
+    
     # Detect bottles #scale 1.05 ging
     bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=12, minSize=(40,30), maxSize=(200,200))
     
@@ -65,7 +80,7 @@ def detectAndDisplay(raw):
             if center[1] >= 720:
                 center[1] = 719
             frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
-            mark_bottle.get3DPosition(center, OdomNow)
+            mark_bottle.get3DPosition(center, camPos, camInfoNow, depthFrameNow)
 
 
     # opens camera windows for debugging
@@ -85,5 +100,5 @@ if not bottle_cascade.load(cv.samples.findFile(bottle_cascade_name)):
     exit(0)
 
 # raw cam data subscriber
-rospy.Subscriber("/camera/color/image_raw", Image, detectAndDisplay)
+rospy.Subscriber("/camera/color/image_raw", Image, detectAndDisplay, buff_size = 2048)
 rospy.spin()

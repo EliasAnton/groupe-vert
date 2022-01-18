@@ -7,7 +7,7 @@
   </node>
 
   <!--  ***************** Python Scripts *****************  -->
-  <node pkg="grp-vert" type="modelTest.py" name="modelTest" output="screen">
+  <node pkg="grp-vert" type="modelTest3.py" name="modelTest" output="screen">
   </node>
 
   <!--  **************** Visualisation ****************  -->

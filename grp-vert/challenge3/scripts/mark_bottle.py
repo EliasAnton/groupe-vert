@@ -19,9 +19,12 @@ bottlePublisher = rospy.Publisher(
     '/bottle',
     Marker, queue_size=10
 )
-
+axisPublisher = rospy.Publisher(
+    '/axes',
+    PoseStamped, queue_size=10
+)
 # global variables
-camInf = CameraInfo()
+camInfo = CameraInfo()
 roboOdom = Odometry()
 bottleIt = 0
 depthFrame = []
@@ -30,8 +33,8 @@ bridge = CvBridge()
 
 # reads the CameraInfo messages and updates the camera object
 def updateCamera(data):
-    global camInf
-    camInf = data
+    global camInfo
+    camInfo = data
 
 # reads the Odom messages and updates the robots position
 def getRoboOdom(data):
@@ -45,41 +48,41 @@ def getDepthImage(raw):
     depthFrame = np.array(bridge.imgmsg_to_cv2(raw, "passthrough"))
 
 # recieves pixel coordinates of centers of regions of interest and determines the 3D coordinates
-def get3DPosition(center, odom_when_detected):
-    global depthFrame
-    global camInf
-    localCamInf = camInf
-    dF = depthFrame
+def get3DPosition(center, camPos_when_detected, camInfo_when_detected, depthFrame_when_detected):
     cam = PinholeCameraModel()
-    cam.fromCameraInfo(localCamInf)
+    cam.fromCameraInfo(camInfo_when_detected)
     print(center)
     interest = cam.rectifyPoint(center)
     coords = cam.projectPixelTo3dRay(interest)
-    depth = dF[int(center[1])][int(center[0])]
+    depth = depthFrame_when_detected[int(center[1])][int(center[0])]
 
     print(depth)
     #calculates position data of the objects with the odom and camera information
-    p = PoseStamped()
-    time = localCamInf.header.stamp
-    p.header.stamp = time
+    p = Pose()
+    # time = localCamInf.header.stamp
+    # p.header.stamp = time
     # p.position.x = coords[2]* (depth/2048)
     # p.position.y = - coords[0]* (depth/2048)
     # p.position.z = coords[1]* (depth/2048)
 
-    # rotation according to robot orientation
-    # vec = [coords[2], coords[0], coords[1]]
-    p.pose.position.x = coords[2]* (depth/2048) + 0.1
-    p.pose.position.y = - (coords[0]* (depth/2048))
-    p.pose.position.z = coords[1]* (depth/2048) + 0.2
-    p.pose.orientation.x = 0.0
-    p.pose.orientation.y = 0.0
-    p.pose.orientation.z = 0.0
-    p.pose.orientation.w = 1.0
-    p_transformed = transform_pose(odom_when_detected, p, "camera_link", "map")
+    p.position.x = coords[2]* (depth/2048)
+    p.position.y = - (coords[0]* (depth/2048))
+    p.position.z = coords[1]* (depth/2048)
+    p.orientation.x = camPos_when_detected.orientation.x
+    p.orientation.y = camPos_when_detected.orientation.y
+    p.orientation.z = camPos_when_detected.orientation.z
+    p.orientation.w = camPos_when_detected.orientation.w
+    
+    #p_transformed = transform_pose(p, "camera_link", "map")
     #publish position
-    bottle_found(p_transformed)
+    p.position.x = p.position.x + camPos_when_detected.position.x
+    p.position.y = p.position.y + camPos_when_detected.position.y
+    p.position.z = p.position.z + camPos_when_detected.position.z
+    
 
-def transform_pose(oNow, input_pose, from_frame, to_frame):
+    bottle_found(p)
+
+def transform_pose(input_pose, from_frame, to_frame):
 
     # **Assuming /tf2 topic is being broadcasted
     tf_buffer = tf2_ros.Buffer()
@@ -89,7 +92,7 @@ def transform_pose(oNow, input_pose, from_frame, to_frame):
     pose_stamped = input_pose
     pose_stamped.header.frame_id = from_frame
     #pose_stamped.header.stamp = oNow.header.stamp
-    pose_stamped.header.stamp = rospy.Time(0)
+    #pose_stamped.header.stamp = rospy.Time(0)
 
     try:
         # ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
