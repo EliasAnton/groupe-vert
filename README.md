@@ -7,6 +7,7 @@ The project uses the ROS framework
 The project needs the [mb6-tbot files](https://bitbucket.org/imt-mobisyst/mb6-tbot/src/master/) intalled aside to work.
 ```
 mkdir catkin-ws
+source /opt/ros/noetic/setup.bash
 cd catkin-ws
 mkdir src
 git clone https://github.com/EliasAnton/groupe-vert.git src/grp-vert
@@ -48,3 +49,19 @@ It has to output the topics:
 - /camera/aligned_depth_to_color/image_raw
 - /camera/color/image_raw
 - /camera/color/camera_info
+
+## Challenge 3
+### Introduction
+This project branch can be used to make a robot move in a real or a simulated environment, by using the move_base-algorithm to autonomously find a way to a given goal position (via rviz). The robot will create a map and will calculate a path to the given goal position by using this data. The map is created with gmapping and is updated frequently as the robot moves around.\
+The visual bottle detection is also inclued in this branch. It uses a depth-camera and a pre-trained classifier to detect and mark bottles it finds while moving around (see Challenge 2). Like in Challenge 2, Opencv also has to be installed.
+
+### Run
+Before running, the move_base and dwa-local-planner package have to be installed:\
+`sudo apt-get install ros-noetic-move-base`\
+`sudo apt-get install ros-noetic-dwa-local-planner`\
+\
+In catkin-ws/src/grp-vert run: `git checkout challenge3`\
+To start the simulation run: `roslaunch grp-vert challenge3_simulation.launch`\
+To start the real robot run: `roslaunch grp-vert challenge3_tbot.launch`\
+(To start the real robot, the robot, the camera and the laser scanner have to be connected via USB)
+
