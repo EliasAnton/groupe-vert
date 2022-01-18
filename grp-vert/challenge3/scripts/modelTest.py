@@ -11,9 +11,9 @@ import os
 
 # upper and lower ranges for our color filters in HSV format
 lower_red = np.array([3,150,50])
-upper_red = np.array([8,245,220])
-lower_white = np.array([0,0,150])
-upper_white = np.array([179,50,220])
+upper_red = np.array([8,255,220])
+lower_white = np.array([0,0,140])
+upper_white = np.array([179,50,210])
 
 # recieves raw image data and uses the trained model to find regions of interest
 def detectAndDisplay(raw):
@@ -21,6 +21,7 @@ def detectAndDisplay(raw):
     global upper_red
     global lower_white
     global upper_white
+    global roboOdom
     bridge = CvBridge()
 
     frame = bridge.imgmsg_to_cv2(raw, desired_encoding='bgr8')
@@ -30,15 +31,15 @@ def detectAndDisplay(raw):
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     maskRed = cv.inRange(hsv, lower_red, upper_red)
     maskWhite = cv.inRange(hsv, lower_white, upper_white)
-    frame=cv.blur(frame, (7, 7))
-    maskRed=cv.erode(maskRed, None, iterations=3)
-    maskRed=cv.dilate(maskRed, None, iterations=3)
-    maskWhite=cv.erode(maskWhite, None, iterations=3)
-    maskWhite=cv.dilate(maskWhite, None, iterations=3)
+    # frame=cv.blur(frame, (7, 7))
+    maskRed=cv.erode(maskRed, None, iterations=1)
+    #maskRed=cv.dilate(maskRed, None, iterations=3)
+    maskWhite=cv.erode(maskWhite, None, iterations=1)
+    #maskWhite=cv.dilate(maskWhite, None, iterations=3)
 
-
-    # Detect bottles
-    bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.4, minNeighbors=8, minSize=(10,10))
+    OdomNow = mark_bottle.roboOdom
+    # Detect bottles #scale 1.05 ging
+    bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=12, minSize=(40,30), maxSize=(200,200))
     
     # checks detected regions for red and white details to eliminate false positives
     redCount = 0
@@ -64,7 +65,7 @@ def detectAndDisplay(raw):
             if center[1] >= 720:
                 center[1] = 719
             frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
-            mark_bottle.get3DPosition(center)
+            mark_bottle.get3DPosition(center, OdomNow)
 
 
     # opens camera windows for debugging

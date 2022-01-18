@@ -22,7 +22,7 @@ bottlePublisher = rospy.Publisher(
 
 # global variables
 camInf = CameraInfo()
-roboPose = Pose()
+roboOdom = Odometry()
 bottleIt = 0
 depthFrame = []
 # # depthFrame.encoding = "mono16"
@@ -34,9 +34,9 @@ def updateCamera(data):
     camInf = data
 
 # reads the Odom messages and updates the robots position
-def getRoboPose(data):
-    global roboPose
-    roboPose = data.pose.pose
+def getRoboOdom(data):
+    global roboOdom
+    roboOdom = data
 
 # reads the depth Image data and converts it to a usable format
 def getDepthImage(raw):
@@ -45,12 +45,10 @@ def getDepthImage(raw):
     depthFrame = np.array(bridge.imgmsg_to_cv2(raw, "passthrough"))
 
 # recieves pixel coordinates of centers of regions of interest and determines the 3D coordinates
-def get3DPosition(center):
+def get3DPosition(center, odom_when_detected):
     global depthFrame
     global camInf
-    global roboPose
     localCamInf = camInf
-    rP = roboPose
     dF = depthFrame
     cam = PinholeCameraModel()
     cam.fromCameraInfo(localCamInf)
@@ -77,11 +75,11 @@ def get3DPosition(center):
     p.pose.orientation.y = 0.0
     p.pose.orientation.z = 0.0
     p.pose.orientation.w = 1.0
-    p_transformed = transform_pose(p, "camera_link", "map")
+    p_transformed = transform_pose(odom_when_detected, p, "camera_link", "map")
     #publish position
     bottle_found(p_transformed)
 
-def transform_pose(input_pose, from_frame, to_frame):
+def transform_pose(oNow, input_pose, from_frame, to_frame):
 
     # **Assuming /tf2 topic is being broadcasted
     tf_buffer = tf2_ros.Buffer()
@@ -90,6 +88,7 @@ def transform_pose(input_pose, from_frame, to_frame):
     pose_stamped = PoseStamped()
     pose_stamped = input_pose
     pose_stamped.header.frame_id = from_frame
+    #pose_stamped.header.stamp = oNow.header.stamp
     pose_stamped.header.stamp = rospy.Time(0)
 
     try:
@@ -128,5 +127,5 @@ def bottle_found(position):
 
 
 rospy.Subscriber("/camera/aligned_depth_to_color/camera_info", CameraInfo, updateCamera)
-rospy.Subscriber("/odom", Odometry, getRoboPose)
+rospy.Subscriber("/odom", Odometry, getRoboOdom)
 rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, getDepthImage)

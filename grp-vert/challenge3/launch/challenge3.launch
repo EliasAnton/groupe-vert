@@ -11,8 +11,8 @@
   </node>
 
   <!--  **************** Visualisation ****************  -->
-  <node pkg="rqt_graph" type="rqt_graph" name="graph">
-  </node>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/challenge3/launch/rviz_config_mapping.rviz">
+  <!-- <node pkg="rqt_graph" type="rqt_graph" name="graph"> </node> -->
+  
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/challenge3/launch/challenge3.rviz">
   </node> 
 </launch>
