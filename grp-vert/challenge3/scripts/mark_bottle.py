@@ -28,7 +28,6 @@ camInfo = CameraInfo()
 roboOdom = Odometry()
 bottleIt = 0
 depthFrame = []
-# # depthFrame.encoding = "mono16"
 bridge = CvBridge()
 
 # reads the CameraInfo messages and updates the camera object
@@ -51,39 +50,36 @@ def getDepthImage(raw):
 def get3DPosition(center, camPos_when_detected, camInfo_when_detected, depthFrame_when_detected):
     cam = PinholeCameraModel()
     cam.fromCameraInfo(camInfo_when_detected)
-    print(center)
+    #print(center)
     interest = cam.rectifyPoint(center)
     coords = cam.projectPixelTo3dRay(interest)
+    #print(coords)
     depth = depthFrame_when_detected[int(center[1])][int(center[0])]
+    #print(depth)
 
-    print(depth)
-    #calculates position data of the objects with the odom and camera information
+    #calculates position data of the objects with the old camera position, depth frame and camera information
     p = Pose()
-    # time = localCamInf.header.stamp
-    # p.header.stamp = time
-    # p.position.x = coords[2]* (depth/2048)
-    # p.position.y = - coords[0]* (depth/2048)
-    # p.position.z = coords[1]* (depth/2048)
+    #y z x in reference to camera_link = coords 0, 1, 2 (in this order)
+    if(depth != 0.0):
+        p.position.x = coords[2]* (depth/1000)
+        p.position.y = -(coords[0]* (depth/1000))
+        p.position.z = -(coords[1]* (depth/1000))
+        #print(p.position)
+        p.orientation.x = camPos_when_detected.orientation.x
+        p.orientation.y = camPos_when_detected.orientation.y
+        p.orientation.z = camPos_when_detected.orientation.z
+        p.orientation.w = camPos_when_detected.orientation.w
+        
+        #publish position
+        p.position.x = p.position.x - camPos_when_detected.position.x
+        p.position.y = p.position.y - camPos_when_detected.position.y
+        p.position.z = p.position.z - camPos_when_detected.position.z
+        #print(p.position)
 
-    p.position.x = coords[2]* (depth/2048)
-    p.position.y = - (coords[0]* (depth/2048))
-    p.position.z = coords[1]* (depth/2048)
-    p.orientation.x = camPos_when_detected.orientation.x
-    p.orientation.y = camPos_when_detected.orientation.y
-    p.orientation.z = camPos_when_detected.orientation.z
-    p.orientation.w = camPos_when_detected.orientation.w
-    
-    #p_transformed = transform_pose(p, "camera_link", "map")
-    #publish position
-    p.position.x = p.position.x + camPos_when_detected.position.x
-    p.position.y = p.position.y + camPos_when_detected.position.y
-    p.position.z = p.position.z + camPos_when_detected.position.z
-    
+        bottle_found(p)
 
-    bottle_found(p)
-
+# transforms a position from one frame to another
 def transform_pose(input_pose, from_frame, to_frame):
-
     # **Assuming /tf2 topic is being broadcasted
     tf_buffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tf_buffer)
@@ -91,8 +87,6 @@ def transform_pose(input_pose, from_frame, to_frame):
     pose_stamped = PoseStamped()
     pose_stamped = input_pose
     pose_stamped.header.frame_id = from_frame
-    #pose_stamped.header.stamp = oNow.header.stamp
-    #pose_stamped.header.stamp = rospy.Time(0)
 
     try:
         # ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
@@ -101,7 +95,6 @@ def transform_pose(input_pose, from_frame, to_frame):
 
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
         raise
-
 
 # creates marker and publishes it in /bottle topic
 def bottle_found(position):

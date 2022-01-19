@@ -63,29 +63,16 @@ def detectAndDisplay(frame):
 # bottle_cascade_name = args.bottle_cascade
 # bottle_cascade = cv.CascadeClassifier()
 
-bottle_cascade_name = '/home/leonie.schleiter/catkin-ws/src/grp-vert/bilderkennung/data2/cascade.xml'
+
+dirname = os.path.dirname(__file__)
+bottle_cascade_name = os.path.join(dirname, './cascade.xml')
 bottle_cascade = cv.CascadeClassifier()
 
-#-- 1. Load the cascade
+# Load the cascade
 if not bottle_cascade.load(cv.samples.findFile(bottle_cascade_name)):
     print('--(!)Error loading bottle cascade')
     exit(0)
 
-#rospy.Subscriber("/camera/color/image_raw", Image, detectAndDisplay)
-# if cv.waitKey(10) == 27:
-#     break
-#rospy.spin()
-
-#-- 2. Read the video stream
-cap=cv.VideoCapture(4)
-if not cap.isOpened:
-    print('--(!)Error opening video capture')
-    exit(0)
-while True:
-    ret, frame = cap.read()
-    if frame is None:
-        print('--(!) No captured frame -- Break!')
-        break
-    detectAndDisplay(frame)
-    if cv.waitKey(10) == 27:
-        break
+# raw cam data subscriber
+rospy.Subscriber("/camera/color/image_raw", Image, detectAndDisplay, buff_size = 2048)
+rospy.spin()
