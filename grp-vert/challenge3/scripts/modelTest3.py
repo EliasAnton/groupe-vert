@@ -84,10 +84,10 @@ def detectAndDisplay(raw):
 
 
     # opens camera windows for debugging
-    cv.imshow('RedMask',maskRed)
-    cv.imshow('WhiteMask',maskWhite)
-    cv.imshow('Capture - Bottle detection', frame)
-    cv.waitKey(1)
+    # cv.imshow('RedMask',maskRed)
+    # cv.imshow('WhiteMask',maskWhite)
+    # cv.imshow('Capture - Bottle detection', frame)
+    # cv.waitKey(1)
 
 
 dirname = os.path.dirname(__file__)

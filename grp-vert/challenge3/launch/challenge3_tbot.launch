@@ -1,33 +1,55 @@
 <launch>
 
-  <!-- Bringup the robot -->
-  <include file="$(find tbot_bringup)/launch/start.launch">
-  </include>
-  
-  <!--  ***************** Laser *****************  -->
-  <node pkg="urg_node" type="urg_node" name="laser_scanner">
+  <!-- Kobuki base -->
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find tbot_description)/urdf/tbot.urdf.xacro'" />
+  <param name="robot_description" command="$(arg urdf_file)" />
+  <include file="$(find kobuki_node)/launch/minimal.launch"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_in_base_footprint"
+    args="0.0 0.0 0.1 0.0 0.0 0.0 /base_footprint /base_link 80" />
+
+  <!-- Laser -->
+  <node name="robot_scan" pkg="urg_node" type="urg_node" >
+    <param name="frame_id" value="laser_link"/>
+    <param name="angle_min" value="-1.6"/>
+    <param name="angle_max" value="1.6"/>
   </node>
+  <node pkg="tf" type="static_transform_publisher" name="laser_in_base_link"
+    args="0.2 0.0 0.05 0.0 0.0 0.0 /base_link /laser_link 80" />
   
+  <!-- Realsense -->
+  <!-- <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="align_depth" value="true" />
+  </include>
+  <node pkg="tf" type="static_transform_publisher" name="camera_in_base_link"
+    args="0.2 0.0 0.1 0.0 0.0 0.0 /base_link /camera_link 80" /> -->
+  
+  <!-- velocity commands multiplexer -->
+  <node pkg="nodelet" type="nodelet" name="cmd_vel_mux" args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+    <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml"/>
+    <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
+  </node>
+
   <!--  ***************** Mapping *****************  -->
   <node pkg="gmapping" type="slam_gmapping" name="mapping_node" args="scan:=scan">
   </node>
 
   <!--  **************** Visualisation ****************  -->
-  <!-- <node pkg="rqt_graph" type="rqt_graph" name="graph"> </node> -->
+  <node pkg="rqt_graph" type="rqt_graph" name="graph"> </node>
   
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find grp-vert)/challenge3/launch/challenge3.rviz">
   </node> 
 
     <!-- Navigation using MoveBase -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
-    <rosparam file="$(find grp-vert)/challenge3/param/local_costmap_params.yaml" command="load" />   
-    <rosparam file="$(find grp-vert)/challenge3/param/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/dwa_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/navfn_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/move_base_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramReal/navfn_global_planner_params.yaml" command="load" />
+    <remap from="/cmd_vel" to="/cmd_vel_mux/input/navi"/>
   </node> 
 
   <!--  ***************** Python Scripts *****************  -->

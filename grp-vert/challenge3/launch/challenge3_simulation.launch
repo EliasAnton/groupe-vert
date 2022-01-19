@@ -18,14 +18,14 @@
 
     <!-- Navigation using MoveBase -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find grp-vert)/challenge3/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
-    <rosparam file="$(find grp-vert)/challenge3/param/local_costmap_params.yaml" command="load" />   
-    <rosparam file="$(find grp-vert)/challenge3/param/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/dwa_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/move_base_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find grp-vert)/challenge3/param/navfn_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/move_base_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find grp-vert)/challenge3/paramSim/navfn_global_planner_params.yaml" command="load" />
   </node> 
 
 </launch>

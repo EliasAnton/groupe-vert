@@ -1,0 +1,5 @@
+Install move_base:
+sudo apt-get install ros-noetic-move-base
+
+sudo apt-get install ros-noetic-dwa-local-planner
+
