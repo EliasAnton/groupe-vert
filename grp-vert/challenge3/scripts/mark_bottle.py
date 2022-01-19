@@ -64,17 +64,18 @@ def get3DPosition(center, camPos_when_detected, camInfo_when_detected, depthFram
         p.position.x = coords[2]* (depth/1000)
         p.position.y = -(coords[0]* (depth/1000))
         p.position.z = -(coords[1]* (depth/1000))
-        #print(p.position)
+        print(p.position)
         p.orientation.x = camPos_when_detected.orientation.x
         p.orientation.y = camPos_when_detected.orientation.y
         p.orientation.z = camPos_when_detected.orientation.z
         p.orientation.w = camPos_when_detected.orientation.w
-        
+        print("Orientation")
+        print(p.orientation)
         #publish position
-        p.position.x = p.position.x - camPos_when_detected.position.x
-        p.position.y = p.position.y - camPos_when_detected.position.y
-        p.position.z = p.position.z - camPos_when_detected.position.z
-        #print(p.position)
+        # p.position.x = p.position.x - camPos_when_detected.position.x
+        # p.position.y = p.position.y - camPos_when_detected.position.y
+        # p.position.z = p.position.z - camPos_when_detected.position.z
+        print(p.position)
 
         bottle_found(p)
 
@@ -102,7 +103,7 @@ def bottle_found(position):
     mrk= Marker()
     h = std_msgs.msg.Header()
     h.stamp = rospy.Time.now()
-    h.frame_id = "map"
+    h.frame_id = "camera_link"
     mrk.header = h
     mrk.ns = "bottles"
     mrk.id = bottleIt
