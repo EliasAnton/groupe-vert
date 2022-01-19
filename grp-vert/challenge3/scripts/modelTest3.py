@@ -16,6 +16,14 @@ lower_red = np.array([3,150,50])
 upper_red = np.array([8,255,220])
 lower_white = np.array([0,0,140])
 upper_white = np.array([179,50,210])
+mapZero = PoseStamped()
+mapZero.pose.position.x = 0
+mapZero.pose.position.y = 0
+mapZero.pose.position.z = 0
+mapZero.pose.orientation.x = 0.0
+mapZero.pose.orientation.y = 0.0
+mapZero.pose.orientation.z = 0.0
+mapZero.pose.orientation.w = 1.0
 
 # recieves raw image data and uses the trained model to find regions of interest
 def detectAndDisplay(raw):
@@ -26,14 +34,7 @@ def detectAndDisplay(raw):
     bridge = CvBridge()
     
     #transform map to camera
-    mapZero = PoseStamped()
-    mapZero.pose.position.x = 0
-    mapZero.pose.position.y = 0
-    mapZero.pose.position.z = 0
-    mapZero.pose.orientation.x = 0.0
-    mapZero.pose.orientation.y = 0.0
-    mapZero.pose.orientation.z = 0.0
-    mapZero.pose.orientation.w = 1.0
+    global mapZero
     camPos = mark_bottle.transform_pose(mapZero, "map", "camera_link")
 
     camInfoNow = mark_bottle.camInfo
@@ -53,7 +54,8 @@ def detectAndDisplay(raw):
     #maskWhite=cv.dilate(maskWhite, None, iterations=3)
     
     # Detect bottles #scale 1.05 ging
-    bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=12, minSize=(40,30), maxSize=(200,200))
+    # bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=12, minSize=(40,30), maxSize=(200,200))
+    bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.05, minNeighbors=10, minSize=(40,30), maxSize=(200,200))
 
     # checks detected regions for red and white details to eliminate false positives
     redCount = 0
