@@ -1,9 +1,0 @@
-- Markierungsmechanismus fertig machen
-- Modell/Farbfilter verbessern
-
-- color filter für orangene Flaschen??
-
-readme:
--schwarze flaschen erkennen
--roter kreis zeigt erkannte flasche an
-
