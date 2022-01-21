@@ -19,10 +19,7 @@ bottlePublisher = rospy.Publisher(
     '/bottle',
     Marker, queue_size=10
 )
-axisPublisher = rospy.Publisher(
-    '/axes',
-    PoseStamped, queue_size=10
-)
+
 # global variables
 camInfo = CameraInfo()
 roboOdom = Odometry()
@@ -50,12 +47,9 @@ def getDepthImage(raw):
 def get3DPosition(center, camPos_when_detected, camInfo_when_detected, depthFrame_when_detected):
     cam = PinholeCameraModel()
     cam.fromCameraInfo(camInfo_when_detected)
-    #print(center)
     interest = cam.rectifyPoint(center)
     coords = cam.projectPixelTo3dRay(interest)
-    #print(coords)
     depth = depthFrame_when_detected[int(center[1])][int(center[0])]
-    #print(depth)
 
     #calculates position data of the objects with the old camera position, depth frame and camera information
     p = Pose()
@@ -64,24 +58,21 @@ def get3DPosition(center, camPos_when_detected, camInfo_when_detected, depthFram
         p.position.x = coords[2]* (depth/1000)
         p.position.y = -(coords[0]* (depth/1000))
         p.position.z = -(coords[1]* (depth/1000))
-        print(p.position)
+
         p.orientation.x = camPos_when_detected.orientation.x
         p.orientation.y = camPos_when_detected.orientation.y
         p.orientation.z = camPos_when_detected.orientation.z
         p.orientation.w = camPos_when_detected.orientation.w
-        print("Orientation")
-        print(p.orientation)
-        #publish position
-        # p.position.x = p.position.x - camPos_when_detected.position.x
-        # p.position.y = p.position.y - camPos_when_detected.position.y
-        # p.position.z = p.position.z - camPos_when_detected.position.z
-        print(p.position)
+        # p.orientation.x = 0
+        # p.orientation.y = 0
+        # p.orientation.z = 0
+        # p.orientation.w = 1
 
         bottle_found(p)
 
 # transforms a position from one frame to another
 def transform_pose(input_pose, from_frame, to_frame):
-    # **Assuming /tf2 topic is being broadcasted
+    # Assuming /tf2 topic is being broadcasted
     tf_buffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tf_buffer)
 
@@ -90,7 +81,7 @@ def transform_pose(input_pose, from_frame, to_frame):
     pose_stamped.header.frame_id = from_frame
 
     try:
-        # ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
+        # It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
         output_pose_stamped = tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(1))
         return output_pose_stamped.pose
 
@@ -119,7 +110,7 @@ def bottle_found(position):
     c.a = 1.0
     mrk.color = c
     bottleIt = bottleIt + 1
-    
+    # publish position
     bottlePublisher.publish(mrk)
 
 

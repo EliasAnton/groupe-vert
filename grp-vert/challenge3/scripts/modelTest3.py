@@ -46,7 +46,6 @@ def detectAndDisplay(raw):
     frame_gray = cv.equalizeHist(frame_gray)
 
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    # hsv =cv.blur(hsv, (3, 3))
     maskRed = cv.inRange(hsv, lower_red, upper_red)
     maskWhite = cv.inRange(hsv, lower_white, upper_white)
     
@@ -56,8 +55,6 @@ def detectAndDisplay(raw):
     # maskWhite=cv.erode(maskWhite, None, iterations=1)
     # maskWhite=cv.dilate(maskWhite, None, iterations=1)
     
-    # Detect bottles #scale 1.05 ging
-    # bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=12, minSize=(40,30), maxSize=(200,200))
     bottles = bottle_cascade.detectMultiScale(image = frame_gray, scaleFactor=1.07, minNeighbors=17, minSize=(25,25), maxSize=(160,160))
 
     # checks detected regions for red and white details to eliminate false positives
@@ -65,7 +62,6 @@ def detectAndDisplay(raw):
     whiteCount = 0
     for (x,y,w,h) in bottles:
         frame = cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        #frame = cv.rectangle(frame, (x, int(y + (h/4))), (x+w, (y + int(h*(3/4)) ) ), (0, 255, 0), 2)   # smaller rectangle
         for i in range(y + int(h/4), y + int(h*(3/4)) ):
             for j in range(x,x+w):
                 pixel = maskRed.item(i,j)
@@ -76,7 +72,6 @@ def detectAndDisplay(raw):
                     whiteCount = whiteCount + 1
         # filter with red and white masks
         if ((redCount >= (h*w)*0.002) and (whiteCount >= (h*w)*0.002)):
-        # if (True):
             falseCenter = (x + w//2, y + h//2)
             center = list(falseCenter)
             if center[0] >= 1280:
@@ -86,10 +81,9 @@ def detectAndDisplay(raw):
             frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
             mark_bottle.get3DPosition(center, camPos, camInfoNow, depthFrameNow)
 
-
-    # opens camera windows for debugging
-    cv.imshow('RedMask',maskRed)
-    cv.imshow('WhiteMask',maskWhite)
+    # opens camera windows for debugging and seeing the detection
+    #cv.imshow('RedMask',maskRed)
+    #cv.imshow('WhiteMask',maskWhite)
     cv.imshow('Capture - Bottle detection', frame)
     cv.waitKey(1)
 
