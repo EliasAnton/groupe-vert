@@ -8,18 +8,13 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import mark_bottle
 import os
-from tf2_geometry_msgs import PoseStamped
 from geometry_msgs.msg import Pose
 
-# upper and lower ranges for our color filters in HSV format
+# upper and lower ranges for our color filters in HSV format, needs configuring for new environments
 lower_red = np.array([1,120,50])
 upper_red = np.array([8,255,225])
 lower_white = np.array([0,0,140])
 upper_white = np.array([179,50,210])
-mapZero = PoseStamped()
-mapZero.pose.position.x = 0
-mapZero.pose.position.y = 0
-mapZero.pose.position.z = 0
 
 # recieves raw image data and uses the trained model to find regions of interest
 def detectAndDisplay(raw):
@@ -29,15 +24,6 @@ def detectAndDisplay(raw):
     global upper_white
     bridge = CvBridge()
     
-    #transform map to camera
-    global mapZero
-
-    mapZero.pose.orientation.x = mark_bottle.roboOdom.pose.pose.orientation.x
-    mapZero.pose.orientation.y = mark_bottle.roboOdom.pose.pose.orientation.y
-    mapZero.pose.orientation.z = mark_bottle.roboOdom.pose.pose.orientation.z
-    mapZero.pose.orientation.w = mark_bottle.roboOdom.pose.pose.orientation.w
-    camPos = mark_bottle.transform_pose(mapZero, "map", "camera_link")
-
     camInfoNow = mark_bottle.camInfo
     depthFrameNow = mark_bottle.depthFrame
 
@@ -49,7 +35,7 @@ def detectAndDisplay(raw):
     maskRed = cv.inRange(hsv, lower_red, upper_red)
     maskWhite = cv.inRange(hsv, lower_white, upper_white)
     
-    # maskRed =cv.blur(maskRed, (3, 3))
+    # options to change the color filters
     # maskRed=cv.erode(maskRed, None, iterations=1)
     # maskRed=cv.dilate(maskRed, None, iterations=1)
     # maskWhite=cv.erode(maskWhite, None, iterations=1)
@@ -70,7 +56,7 @@ def detectAndDisplay(raw):
                     redCount = redCount + 1
                 if (pixel2 ==255):
                     whiteCount = whiteCount + 1
-        # filter with red and white masks
+        # filter with red and white masks, feel free to change values
         if ((redCount >= (h*w)*0.002) and (whiteCount >= (h*w)*0.002)):
             falseCenter = (x + w//2, y + h//2)
             center = list(falseCenter)
@@ -79,7 +65,7 @@ def detectAndDisplay(raw):
             if center[1] >= 720:
                 center[1] = 719
             frame = cv.ellipse(frame, falseCenter, (w//2, h//2), 0, 0, 360, (0, 0, 255), 4)
-            mark_bottle.get3DPosition(center, camPos, camInfoNow, depthFrameNow)
+            mark_bottle.get3DPosition(center, camInfoNow, depthFrameNow)
 
     # opens camera windows for debugging and seeing the detection
     #cv.imshow('RedMask',maskRed)
