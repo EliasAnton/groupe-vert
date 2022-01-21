@@ -2,6 +2,7 @@
 Leonie Schleiter & Elias Anton\
 Script language: Python 3\
 The project uses the ROS framework
+Presentation video: https://youtu.be/9KSGRv3f-HQ
 
 ## Installation on new computer:
 The project needs the [mb6-tbot files](https://bitbucket.org/imt-mobisyst/mb6-tbot/src/master/) intalled aside to work.
