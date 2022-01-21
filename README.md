@@ -2,6 +2,7 @@
 Leonie Schleiter & Elias Anton\
 Script language: Python 3\
 The project uses the ROS framework
+Presentation video: https://youtu.be/9KSGRv3f-HQ
 
 ## Installation on new computer:
 The project needs the [mb6-tbot files](https://bitbucket.org/imt-mobisyst/mb6-tbot/src/master/) intalled aside to work.
@@ -53,7 +54,8 @@ It has to output the topics:
 ## Challenge 3
 ### Introduction
 This project branch can be used to make a robot move in a real or a simulated environment, by using the move_base-algorithm to autonomously find a way to a given goal position (via rviz). The robot will create a map and will calculate a path to the given goal position by using this data. The map is created with gmapping and is updated frequently as the robot moves around.\
-The visual bottle detection is also inclued in this branch. It uses a depth-camera and a pre-trained classifier to detect and mark bottles it finds while moving around (see Challenge 2). Like in Challenge 2, Opencv also has to be installed.
+The visual bottle detection is also inclued in this branch. It uses a depth-camera and a pre-trained classifier to detect and mark black bottles it finds while moving around (see Challenge 2). Points of interests, that our classifier detects, are marked with a green square in the camera window. If our color filters see red and white color aswell, you will see a red circle in the camera window and a marker is placed on the map.\
+Like in Challenge 2, Opencv also has to be installed.
 
 ### Run
 Before running, the move_base and dwa-local-planner package have to be installed:\
