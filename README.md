@@ -1,7 +1,7 @@
 # Groupe Vert
 Leonie Schleiter & Elias Anton\
 Script language: Python 3\
-The project uses the ROS framework
+The project uses the ROS framework\
 Presentation video: https://youtu.be/9KSGRv3f-HQ
 
 ## Installation on new computer:
